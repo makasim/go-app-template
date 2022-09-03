@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +19,6 @@ func main() {
 	time.Local = time.UTC
 
 	l, _ := zap.NewProduction()
-	defer l.Sync()
 	l = l.With(zap.String("app", "greeter"))
 
 	cfg := app.Config{
@@ -27,19 +27,26 @@ func main() {
 
 	if err := envconfig.Process("", &cfg); err != nil {
 		l.Error("envconfig process failed", zap.Error(err))
-		l.Sync()
+		if err := l.Sync(); err != nil {
+			log.Printf("zap: sync: %s", err)
+		}
 		os.Exit(1)
 	}
 
 	ctx, ctxCancel := context.WithCancel(context.Background())
-	defer ctxCancel()
 
 	go handleSignals(ctxCancel, l)
 
 	if err := app.New(cfg, l).Run(ctx); err != nil {
 		l.Error("app run failed", zap.Error(err))
-		l.Sync()
+		if err := l.Sync(); err != nil {
+			log.Printf("zap: sync: %s", err)
+		}
 		os.Exit(1)
+	}
+
+	if err := l.Sync(); err != nil {
+		log.Printf("zap: sync: %s", err)
 	}
 }
 
@@ -53,6 +60,8 @@ func handleSignals(cancel context.CancelFunc, l *zap.Logger) {
 
 	<-signals
 	l.Warn("got second signal; force exiting")
-	l.Sync()
+	if err := l.Sync(); err != nil {
+		log.Printf("zap: sync: %s", err)
+	}
 	os.Exit(1)
 }

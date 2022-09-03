@@ -36,7 +36,11 @@ func (app *App) Run(ctx context.Context) error {
 	g := greeter.New(app.cfg.Greet)
 
 	s := &http.Server{
-		Addr: app.cfg.ServerAddr,
+		Addr:              app.cfg.ServerAddr,
+		ReadTimeout:       time.Second * 5,
+		ReadHeaderTimeout: time.Second,
+		WriteTimeout:      time.Second * 5,
+		IdleTimeout:       time.Second * 60,
 	}
 	s.Handler = greethandler.New(g, app.l)
 
@@ -57,7 +61,7 @@ func (app *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	// gracefull shutdown
+	// graceful shutdown
 
 	return nil
 }

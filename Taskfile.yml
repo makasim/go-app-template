@@ -1,0 +1,63 @@
+version: '3'
+
+vars:
+  GO: '{{default "go" .GO}}'
+  GOPROXY: 'off'
+  #GOPRIVATE=git.company.com'
+
+  APP: 'greeter'
+  TEST_IMAGE: 'golang:1.18-10-debian'
+  BUILD_IMAGE: 'golang:1.18-10-alpine'
+
+tasks:
+  install:
+    desc: "Install go modules"
+    cmds:
+      - '{{.GO}} mod tidy && {{.GO}} mod vendor'
+    env:
+      GOPROXY: '{{default "https://proxy.golang.org" .GOPROXY}}'
+      #GOPRIVATE=git.company.com'
+
+  build:
+    desc: "Build go binary."
+    cmds:
+      - |
+        set -e
+
+        APP=${APP:-"{{.APP}}"}
+        [ -z "$APP" ] && (echo "\$APP is empty"; exit 1)
+
+        CGO_ENABLED={{.CGO_ENABLED}}
+        BINARY=${BINARY:-$APP}
+        
+        {{.GO}} build {{.DEF_ARGS}} {{.CLI_ARGS}} -ldflags "{{.DEF_LDFLAGS}} {{.LDFLAGS}}" -o "$BINARY" {{.MAIN}}
+    vars:
+      DEF_ARGS: '{{default "-tags netgo -mod=vendor" .DEF_ARGS}}'
+      DEF_LDFLAGS: ""
+      CGO_ENABLED: '{{default "0" .CGO_ENABLED}}'
+      MAIN: '{{default "./main/main.go" .MAIN}}'
+
+  'run':
+    desc: 'Runs app with dev config'
+    cmds:
+      - '{{.GO}} run {{.MAIN}} {{.CLI_ARGS}}'
+    vars:
+      GO: '{{default "go" .GO}}'
+      MAIN: '{{default "./main/main.go" .MAIN}}'
+
+  'test:unit':
+    desc: 'Runs unit tests.'
+    cmds:
+      - '{{.GOTEST}} {{.DEF_ARGS}} {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.DEF_TESTS}}{{end}}'
+    vars:
+      GOTEST: '{{default "go test" .GOTEST}}'
+      DEF_TESTS: '{{default "./..." .DEF_TESTS}}'
+      DEF_ARGS: '{{default "-mod=vendor -v" .DEF_ARGS}}'
+
+  'lint':
+    desc: 'Runs golangci-lint linter'
+    cmds:
+      - '{{ .GOLANGCI_LINT_BIN }} run --modules-download-mode=vendor --config=.golangci.yml --timeout={{ .LINT_TIMEOUT }}'
+    vars:
+      GOLANGCI_LINT_BIN: '{{default "golangci-lint" .GOLANGCI_LINT_BIN}}'
+      LINT_TIMEOUT: '{{default "600s" .LINT_TIMEOUT}}'

@@ -1,0 +1,92 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  gocyclo:
+    min-complexity: 25
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
+  gocritic:
+    enabled-tags:
+      - performance
+      - style
+      - experimental
+    disabled-checks:
+      - wrapperFunc
+      - hugeParam
+      - rangeValCopy
+
+linters:
+  disable-all: true
+  enable:
+    - megacheck
+    - govet
+    - unconvert
+    - megacheck
+    - structcheck
+    - gas
+    - gocyclo
+    - dupl
+    - misspell
+    - unparam
+    - varcheck
+    - deadcode
+    - typecheck
+    - ineffassign
+    - varcheck
+    - stylecheck
+    - gochecknoinits
+    - exportloopref
+    - gocritic
+    - revive
+    - nakedret
+    - gosimple
+    - prealloc
+
+  fast: false
+
+run:
+  modules-download-mode: readonly
+  skip-dirs:
+    - vendor
+    - .go
+    - sdk/vendor
+    - sdk/proto/gen
+  concurrency: 4
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+    - text: "comment on exported method"
+      linters:
+        - revive
+    - text: "should have comment or be unexported"
+      linters:
+        - revive
+    - text: "comment on exported var"
+      linters:
+        - revive
+    - text: "should have comment (or a comment on this block) or be unexported"
+      linters:
+        - revive
+    - text: "at least one file in a package should have a package comment"
+      linters:
+        - stylecheck
+    - text: "shadow: declaration of \"err\" shadows declaration"
+      linters:
+        - govet
+
+  exclude-use-default: false
+
+service:
+  golangci-lint-version: 1.20.x
