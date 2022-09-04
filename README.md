@@ -45,3 +45,43 @@ The method purpose is to:
 
 The app must be run synchronously from `main.go` file.
 It must block until the root context is canceled.
+
+### Unit tests
+
+Run all tests:
+```shell
+task test:unit
+```
+
+Run some tests:
+```shell
+task test:unit -- ./internal/greeter/...
+```
+
+Filter tests:
+```shell
+task test:unit -- ./... -v -run TestGreeter_Greet/Hi
+```
+
+### Func tests
+
+Run all tests:
+```shell
+task test:func
+```
+
+Run some tests:
+```shell
+task test:func -- ./tests/api/...
+```
+
+Enter test container:
+```shell
+task test:func:enter
+# you'll get into container shell
+# you can run there several commands 
+task test:func 
+task test:func -- ./tests/... -v 
+```
+
+

@@ -6,8 +6,11 @@ vars:
   #GOPRIVATE=git.company.com'
 
   APP: 'greeter'
-  TEST_IMAGE: 'golang:1.18-10-debian'
-  BUILD_IMAGE: 'golang:1.18-10-alpine'
+  TEST_IMAGE: 'golang:1.18.5-bullseye'
+  BUILD_IMAGE: 'golang:1.18.5-alpine3.16'
+
+includes:
+  'test:func': 'TestFuncTaskfile.yml'
 
 tasks:
   install:
@@ -53,6 +56,11 @@ tasks:
       GOTEST: '{{default "go test" .GOTEST}}'
       DEF_TESTS: '{{default "./..." .DEF_TESTS}}'
       DEF_ARGS: '{{default "-mod=vendor -v" .DEF_ARGS}}'
+
+  'test:func':
+    desc: 'Runs functional tests.'
+    cmds:
+      - task: 'test:func:test'
 
   'lint':
     desc: 'Runs golangci-lint linter'

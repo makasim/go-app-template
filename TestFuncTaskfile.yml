@@ -1,0 +1,48 @@
+version: '3'
+
+vars:
+  APP_DIR: { sh: 'pwd' }
+
+env:
+  TEST_IMAGE: '{{.TEST_IMAGE}}'
+  TEST_COMPOSE_FILE: 'tests/docker-compose.yml'
+  TEST: './tests/...'
+  COMPOSE_PROJECT_NAME: '{{.APP}}-func-tests'
+  APP: '{{.APP}}'
+  GOTEST: '{{.GOTEST}}'
+  APP_DIR: '{{.APP_DIR}}'
+  CGO_ENABLED: '{{.CGO_ENABLED}}'
+
+tasks:
+  'test':
+    desc: 'Runs func tests.'
+    cmds:
+      - |
+        [ -z "$APP" ] && (echo "\$APP is empty"; exit 1)
+        [ -z "$TEST_IMAGE" ] && (echo "\$TEST_IMAGE is empty"; exit 1)
+
+        {{ if .FUNC_TEST}}
+        {{.GOTEST}} {{.DEF_ARGS}} {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.DEF_TESTS}}{{end}}
+        {{ else }}
+        task test:func:clean
+        echo $TEST_IMAGE;
+        docker compose --file {{.TEST_COMPOSE_FILE}} run \
+          --env APP_DIR \
+          --env TEST_IMAGE \
+          --use-aliases \
+          --entrypoint "/bin/bash -c \"{{if .TEST_BEFORE_SCRIPT}}{{.TEST_BEFORE_SCRIPT}} && {{end}}{{.GOTEST}} {{.DEF_ARGS}} {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.DEF_TESTS}}{{end}}\"" \
+          tests
+        {{ end }}
+    vars:
+      DEF_TESTS: './tests/...'
+      DEF_ARGS: '-mod=vendor -tags func_test -race -count=1 -p 1 -v'
+
+  'enter':
+    desc: 'Enter the container with functional tests'
+    cmds:
+      - 'docker compose --file {{.TEST_COMPOSE_FILE}} run --entrypoint="{{if .TEST_BEFORE_SCRIPT}}/bin/bash -c \"{{.TEST_BEFORE_SCRIPT}} && exec /bin/bash\"{{else}}/bin/bash{{end}}" --use-aliases tests'
+
+  'clean':
+    desc: 'Remove docker compose services'
+    cmds:
+      - 'docker compose --file {{.TEST_COMPOSE_FILE}} down --remove-orphans'

@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  tests:
+    image: '${TEST_IMAGE}'
+    working_dir: '/app'
+    tty: true
+    stdin_open: true
+    restart: 'no'
+    environment:
+      - 'CGO_ENABLED=${CGO_ENABLED}'
+      - 'GOTEST=${GOTEST}'
+      - 'FUNC_TEST=1'
+      - 'GOCACHE=/go/cache'
+      - 'GOPROXY=off'
+      - 'GOPRIVATE=git.company.com'
+    volumes:
+      - '${APP_DIR}:/app'
+      - '${GOPATH}/pkg:/go/pkg'
+      - '${GOCACHE}:/go/cache'
