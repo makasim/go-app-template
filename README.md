@@ -6,6 +6,7 @@ The repo contains an app template that I use most of the time.
 * How to write [unit test](internal/greeter/greeter_test.go) with [mocks](internal/api/greethandler/handler_test.go).
 * How to write [func tests](tests/api_test/greethandler_test.go).
 * How to structure cli commands with [Taskfile](Taskfile.yml).
+* Gitlab CI [example](.gitlab-ci.yml).
 
 ## Walk through 
 
