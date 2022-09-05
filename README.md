@@ -2,11 +2,10 @@
 
 The repo contains an app template that I use most of the time.
 
-* It shows how to decouple app logic from main file. 
-* How to write unit tests with mocks.
-* How to write func tests.
-* How to use Taskfile.
-
+* It shows how to decouple [app logic](internal/app/app.go) from [main](main/main.go) file. 
+* How to write [unit test](internal/greeter/greeter_test.go) with [mocks](internal/api/greethandler/handler_test.go).
+* How to write [func tests](tests/api_test/greethandler_test.go).
+* How to structure cli commands with [Taskfile](Taskfile.yml).
 
 ## Walk through 
 
