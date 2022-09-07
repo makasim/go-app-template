@@ -6,8 +6,8 @@ vars:
   #GOPRIVATE=git.company.com'
 
   APP: 'greeter'
-  TEST_IMAGE: 'golang:1.18.5-bullseye'
-  BUILD_IMAGE: 'golang:1.18.5-alpine3.16'
+  TEST_IMAGE: 'docker.io/makasim/build-image:1.18-1-debian-amd64'
+  BUILD_IMAGE: 'docker.io/makasim/build-image:1.18-1-debian-amd64'
 
 includes:
   'test:func': 'TestFuncTaskfile.yml'
