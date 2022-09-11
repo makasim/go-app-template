@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+	_ "github.com/makasim/buildinfo"
 	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 

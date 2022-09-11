@@ -29,14 +29,18 @@ tasks:
 
         APP=${APP:-"{{.APP}}"}
         [ -z "$APP" ] && (echo "\$APP is empty"; exit 1)
-
-        CGO_ENABLED={{.CGO_ENABLED}}
-        BINARY=${BINARY:-$APP}
         
+        CGO_ENABLED={{.CGO_ENABLED}}
+        COMMIT=${COMMIT:-$(git rev-list -1 HEAD | cut -c1-8)}
+        BUILD_DATE=${BUILD_DATE:-$(date +"%Y-%m-%d_%T%z")}
+        BINARY=${BINARY:-$APP}
+        VERSION=${VERSION:-$COMMIT}
+        
+        echo "Building $VERSION ($COMMIT $BUILD_DATE) binary $BINARY" 
         {{.GO}} build {{.DEF_ARGS}} {{.CLI_ARGS}} -ldflags "{{.DEF_LDFLAGS}} {{.LDFLAGS}}" -o "$BINARY" {{.MAIN}}
     vars:
       DEF_ARGS: '{{default "-tags netgo -mod=vendor" .DEF_ARGS}}'
-      DEF_LDFLAGS: ""
+      DEF_LDFLAGS: '{{default "-X github.com/makasim/buildinfo.Commit=${COMMIT} -X github.com/makasim/buildinfo.Version=${VERSION} -X github.com/makasim/buildinfo.Date=${BUILD_DATE}" .DEF_LDFLAGS}}'
       CGO_ENABLED: '{{default "0" .CGO_ENABLED}}'
       MAIN: '{{default "./main/main.go" .MAIN}}'
 

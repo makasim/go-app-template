@@ -4,13 +4,13 @@ go 1.19
 
 require (
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/makasim/buildinfo v0.0.0-20220911101711-7d8095061b2d
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/zap v1.23.0
 )
 
 require (
-	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
